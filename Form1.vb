@@ -147,7 +147,7 @@ Public Class Form1
                                         storedPassword = rdr.GetString(idx)
                                     End If
 
-                                    'Debugging
+
                                     'MsgBox($"DB:'{storedPassword}' (len={storedPassword.Length}) | Input:'{txtbx_input.Text.Trim()}' (len={txtbx_input.Text.Trim().Length})")
 
                                     If String.Equals(txtbx_input.Text.Trim(), storedPassword.Trim(), StringComparison.Ordinal) Then
