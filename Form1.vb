@@ -19,7 +19,7 @@ Public Class Form1
     End Sub
 
     Private Sub btn_1_Click(sender As Object, e As EventArgs) Handles btn_next.Click
-        'debugging
+        
         'Label1.Text = "Mode: " & mode
         If mode = "sqlFirstName" Then
             Try
