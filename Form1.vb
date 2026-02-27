@@ -6,7 +6,7 @@ Imports System.Diagnostics.Eventing.Reader
 Public Class Form1
     Private ReadOnly connString As String = "Server=127.0.0.1;User ID=root;Password=Qqgj6686;Database=cpe_221;AllowPublicKeyRetrieval=True;"
     Dim mode As String
-    Dim userName As String 'test
+    Dim userName As String
     Dim firstName As String
     Dim lastName As String
 
