@@ -7,7 +7,7 @@ Public Class Form1
     Private ReadOnly connString As String = "Server=127.0.0.1;User ID=root;Password=Qqgj6686;Database=cpe_221;AllowPublicKeyRetrieval=True;"
     Dim mode As String
     Dim userName As String
-    Dim firstName As String
+    Dim firstName As String 'test
     Dim lastName As String
 
     Private Sub User_Login_Design_Load(sender As Object, e As EventArgs) Handles MyBase.Load
