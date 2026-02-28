@@ -4,7 +4,13 @@ Imports System.Data
 Imports System.Diagnostics.Eventing.Reader
 
 Public Class Form1
-    Private ReadOnly connString As String = "Server=127.0.0.1;User ID=root;Password=Qqgj6686;Database=cpe_221;AllowPublicKeyRetrieval=True;"
+    Private ReadOnly connString As String =
+                            "Server=mysql-2bcvngvt87654-developer242005-158b.j.aivencloud.com;" &
+                            "Port=12587;" &
+                            "Database=cpe221;" &
+                            "Uid=avnadmin;" &
+                            "Pwd=AVNS_zqTo32pnIgcTnqiHRHQ;" &
+                            "SslMode=Required;"
     Dim mode As String
     Dim userName As String
     Dim firstName As String
@@ -60,7 +66,7 @@ Public Class Form1
                     txtbx_input.PasswordChar = ControlChars.NullChar
                 Else
 
-                    Dim qry As String = "SELECT userName FROM tbl_ep1 WHERE userName = @username LIMIT 1;"
+                    Dim qry As String = "SELECT userName FROM Accounts WHERE userName = @username LIMIT 1;"
                     Try
                         Using cn As New MySqlConnection(connString)
                             cn.Open()
@@ -70,7 +76,7 @@ Public Class Form1
                                     If reader.Read() Then
                                         MsgBox("Username is already taken")
                                     Else
-                                        Dim query As String = "INSERT INTO tbl_ep1 (firstName, lastName, userName, password) VALUES (@firstname, @lastname, @username, @password);"
+                                        Dim query As String = "INSERT INTO Accounts (firstName, lastName, userName, password) VALUES (@firstname, @lastname, @username, @password);"
                                         Using con As New MySqlConnection(connString)
                                             con.Open()
                                             Using comd As New MySqlCommand(query, con)
@@ -106,7 +112,7 @@ Public Class Form1
             End Try
 
         ElseIf mode = "readerUserName" Then
-            Dim query As String = "SELECT userName FROM tbl_ep1 WHERE userName = @username LIMIT 1;"
+            Dim query As String = "SELECT userName FROM Accounts WHERE userName = @username LIMIT 1;"
             Try
                 Using cn As New MySqlConnection(connString)
                     cn.Open()
@@ -130,7 +136,7 @@ Public Class Form1
             End Try
 
         ElseIf mode = "readerPassword" Then
-            Dim query As String = "SELECT password FROM tbl_ep1 WHERE userName = @username LIMIT 1;"
+            Dim query As String = "SELECT password FROM Accounts WHERE userName = @username LIMIT 1;"
             Try
                 If String.IsNullOrWhiteSpace(userName) Then
                     MsgBox("No username selected. Enter username first.")
@@ -151,14 +157,15 @@ Public Class Form1
                                     'MsgBox($"DB:'{storedPassword}' (len={storedPassword.Length}) | Input:'{txtbx_input.Text.Trim()}' (len={txtbx_input.Text.Trim().Length})")
 
                                     If String.Equals(txtbx_input.Text.Trim(), storedPassword.Trim(), StringComparison.Ordinal) Then
+                                        Form2.Show()
                                         MsgBox("Login successful! Welcome, " & userName & ".")
                                         txtbx_input.Text = "Enter Username"
                                         chk_show_pass.Visible = False
-                                        mode = String.Empty
+                                        mode = "readerUserName"
                                         userName = String.Empty
                                         txtbx_input.PasswordChar = ControlChars.NullChar
                                         btn_create_acc.Text = "Create Account"
-                                        Form2.Show()
+
                                     Else
                                         MsgBox("Incorrect password. Please try again.")
                                         txtbx_input.Text = ""

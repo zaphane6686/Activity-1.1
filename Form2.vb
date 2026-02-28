@@ -5,17 +5,23 @@ Imports System.Diagnostics.Eventing.Reader
 Imports System.Windows.Forms
 
 Public Class Form2
-    Private ReadOnly connection = New MySqlConnection("server=localhost;userid=root;password=Qqgj6686;database=cpe_221")
+    Private ReadOnly connString As String =
+                            "Server=mysql-2bcvngvt87654-developer242005-158b.j.aivencloud.com;" &
+                            "Port=12587;" &
+                            "Database=cpe221;" &
+                            "Uid=avnadmin;" &
+                            "Pwd=AVNS_zqTo32pnIgcTnqiHRHQ;" &
+                            "SslMode=Required;"
 
     Private Sub Form2_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         LoadDataIntoGrid()
     End Sub
 
     Private Sub LoadDataIntoGrid(Optional customQuery As String = Nothing)
-        Dim query As String = If(String.IsNullOrWhiteSpace(customQuery), "SELECT * FROM items;", customQuery)
+        Dim query As String = If(String.IsNullOrWhiteSpace(customQuery), "SELECT * FROM Items;", customQuery)
 
         Try
-            Using cn As New MySqlConnection(connection.ConnectionString)
+            Using cn As New MySqlConnection(connString)
                 cn.Open()
                 Using da As New MySqlDataAdapter(query, cn)
                     Dim dt As New DataTable()
