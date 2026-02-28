@@ -40,7 +40,7 @@ Partial Class Form2
         dgv_inventory.Location = New Point(338, 94)
         dgv_inventory.Name = "dgv_inventory"
         dgv_inventory.RowHeadersWidth = 51
-        dgv_inventory.Size = New Size(1057, 534)
+        dgv_inventory.Size = New Size(978, 534)
         dgv_inventory.TabIndex = 0
         ' 
         ' btn_fruit
