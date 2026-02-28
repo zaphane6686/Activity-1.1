@@ -2,6 +2,7 @@
 Imports Mysqlx.Cursor
 Imports System.Data
 Imports System.Diagnostics.Eventing.Reader
+Imports System.Diagnostics
 
 Public Class Form1
     Private ReadOnly connString As String =
@@ -70,7 +71,7 @@ Public Class Form1
                             Using cn As New MySqlConnection(connString)
                                 cn.Open()
                                 Using cmd As New MySqlCommand(qry, cn)
-                                    cmd.Parameters.AddWithValue("@username", txtbx_input.Text.Trim())
+                                    cmd.Parameters.AddWithValue("@username", userName)
                                     Using reader As MySqlDataReader = cmd.ExecuteReader()
                                         If reader.Read() Then
                                             MsgBox("Username is already taken")
@@ -83,12 +84,20 @@ Public Class Form1
                                                     comd.Parameters.AddWithValue("@password", password)
                                                     comd.Parameters.AddWithValue("@firstname", firstName)
                                                     comd.Parameters.AddWithValue("@lastname", lastName)
-                                                    Dim affected As Integer = comd.ExecuteNonQuery()
-                                                    If affected > 0 Then
-                                                        MsgBox("Record saved.")
-                                                    Else
-                                                        MsgBox("No rows were inserted.")
-                                                    End If
+                                                    Try
+                                                        Dim affected As Integer = comd.ExecuteNonQuery()
+                                                        If affected > 0 Then
+                                                            MsgBox("Record saved.")
+                                                        Else
+                                                            MsgBox("No rows were inserted.")
+                                                        End If
+                                                    Catch mex As MySqlException
+                                                        If mex.Number = 1062 Then
+                                                            MsgBox("Username already exists. Please choose a different username.")
+                                                        Else
+                                                            MsgBox("Database error while inserting record: " & mex.Message)
+                                                        End If
+                                                    End Try
                                                 End Using
                                             End Using
 
@@ -159,22 +168,22 @@ Public Class Form1
                                                 If Not rdr.IsDBNull(accIdx) Then
                                                     accountId = rdr.GetInt32(accIdx)
                                                 End If
-                                            Catch
-
+                                            Catch ex As Exception
+                                                Debug.WriteLine("Error reading account_id: " & ex.Message)
                                             End Try
                                         End If
 
                                         If String.Equals(txtbx_input.Text.Trim(), storedPassword.Trim(), StringComparison.Ordinal) Then
                                             Try
                                                 Form2.AccountId = accountId
-                                            Catch
-
+                                            Catch ex As Exception
+                                                Debug.WriteLine("Failed to set Form2.AccountId: " & ex.Message)
                                             End Try
 
                                             Try
                                                 RemoveHandler Form2.FormClosed, AddressOf Form2_FormClosed
-                                            Catch
-
+                                            Catch ex As Exception
+                                                Debug.WriteLine("Failed to remove Form2.FormClosed handler: " & ex.Message)
                                             End Try
                                             AddHandler Form2.FormClosed, AddressOf Form2_FormClosed
                                             Me.Hide()
@@ -275,8 +284,10 @@ Public Class Form1
         End Select
     End Sub
 
-    Private Sub txtbx_input_MouseEnter(sender As Object, e As EventArgs) Handles txtbx_input.MouseEnter
-        txtbx_input.Text = ""
+    Private Sub txtbx_input_Click(sender As Object, e As EventArgs) Handles txtbx_input.Click
+        If txtbx_input.Text.StartsWith("Enter", StringComparison.OrdinalIgnoreCase) Then
+            txtbx_input.Text = ""
+        End If
         If mode = "readerPassword" OrElse mode = "sqlPassWord" Then
             txtbx_input.PasswordChar = "*"c
         Else
@@ -284,9 +295,19 @@ Public Class Form1
         End If
     End Sub
 
+    Private Sub txtbx_input_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtbx_input.KeyPress
+        If txtbx_input.Text.StartsWith("Enter", StringComparison.OrdinalIgnoreCase) AndAlso Not Char.IsControl(e.KeyChar) Then
+            txtbx_input.Text = ""
+            txtbx_input.SelectionStart = 0
+            If mode = "readerPassword" OrElse mode = "sqlPassWord" Then
+                txtbx_input.PasswordChar = "*"c
+            Else
+                txtbx_input.PasswordChar = ControlChars.NullChar
+            End If
+        End If
+    End Sub
+
     Private Sub txtbx_input_KeyDown(sender As Object, e As KeyEventArgs) Handles txtbx_input.KeyDown
-        ' When Enter is pressed and the textbox contains user input (not the placeholder),
-        ' trigger the Next button only.
         If e.KeyCode = Keys.Enter Then
             e.Handled = True
             e.SuppressKeyPress = True
@@ -296,7 +317,6 @@ Public Class Form1
                 Return
             End If
 
-            ' treat the placeholder prompts that start with "Enter" as not valid input
             If txt.StartsWith("Enter", StringComparison.OrdinalIgnoreCase) Then
                 Return
             End If
@@ -308,8 +328,8 @@ Public Class Form1
     Private Sub Form2_FormClosed(sender As Object, e As FormClosedEventArgs)
         Try
             RemoveHandler Form2.FormClosed, AddressOf Form2_FormClosed
-        Catch
-
+        Catch ex As Exception
+            Debug.WriteLine("Failed to remove Form2.FormClosed handler in Form2_FormClosed: " & ex.Message)
         End Try
         Me.Show()
     End Sub
