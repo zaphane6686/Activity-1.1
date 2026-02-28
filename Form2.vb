@@ -12,42 +12,53 @@ Public Class Form2
                             "Uid=avnadmin;" &
                             "Pwd=AVNS_zqTo32pnIgcTnqiHRHQ;" &
                             "SslMode=Required;"
+    <System.ComponentModel.Browsable(False)>
+    <System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)>
+    Public Property AccountId As Integer = -1
+    Private Property CurrentType As String = "fruit"
 
     Private Sub Form2_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        CurrentType = "fruit"
+        AddHandler btn_fruit.Click, AddressOf OnTypeButtonClick
+        AddHandler btn_vegetable.Click, AddressOf OnTypeButtonClick
+        AddHandler btn_meat.Click, AddressOf OnTypeButtonClick
+        AddHandler btn_dairy.Click, AddressOf OnTypeButtonClick
+        AddHandler btn_bread.Click, AddressOf OnTypeButtonClick
+        AddHandler btn_beverage.Click, AddressOf OnTypeButtonClick
+
         LoadDataIntoGrid()
     End Sub
 
     Private Sub LoadDataIntoGrid(Optional customQuery As String = Nothing)
-        Dim query As String = If(String.IsNullOrWhiteSpace(customQuery), "SELECT * FROM Items;", customQuery)
+        Dim baseQuery As String = "SELECT `name`, `ammount` FROM Items WHERE `type` = @type"
+        If AccountId >= 0 Then
+            baseQuery &= " AND account_id = @accountId"
+        End If
+        baseQuery &= " ORDER BY `name`"
+
+        Dim query As String = If(String.IsNullOrWhiteSpace(customQuery), baseQuery, customQuery)
 
         Try
             Using cn As New MySqlConnection(connString)
                 cn.Open()
                 Using da As New MySqlDataAdapter(query, cn)
-                    Dim dt As New DataTable()
-                    da.Fill(dt)
-
-                    ' find first DataGridView on the form
-                    Dim targetDgv As DataGridView = Nothing
-                    For Each ctl As Control In Me.Controls
-                        If TypeOf ctl Is DataGridView Then
-                            targetDgv = DirectCast(ctl, DataGridView)
-                            Exit For
-                        End If
-                    Next
-
-                    If targetDgv Is Nothing Then
-                        MsgBox("No DataGridView found on the form to display data.")
-                        Return
+                    da.SelectCommand.Parameters.Clear()
+                    da.SelectCommand.Parameters.AddWithValue("@type", CurrentType)
+                    If AccountId >= 0 Then
+                        da.SelectCommand.Parameters.AddWithValue("@accountId", AccountId)
                     End If
 
-                    targetDgv.DataSource = dt
-
-                    FormatDataGridAsBox(targetDgv)
-                    MakeCellsSquare(targetDgv)
-
-                    AddHandler targetDgv.Resize, Sub(s, ev) MakeCellsSquare(targetDgv)
-                    AddHandler targetDgv.ColumnWidthChanged, Sub(s, ev) MakeCellsSquare(targetDgv)
+                    Dim dt As New DataTable()
+                    da.Fill(dt)
+                    dgv_inventory.DataSource = dt
+                    If dgv_inventory.Columns.Contains("name") Then
+                        dgv_inventory.Columns("name").HeaderText = "Name"
+                        dgv_inventory.Columns("name").DisplayIndex = 0
+                    End If
+                    If dgv_inventory.Columns.Contains("ammount") Then
+                        dgv_inventory.Columns("ammount").HeaderText = "Amount"
+                        dgv_inventory.Columns("ammount").DisplayIndex = 1
+                    End If
                 End Using
             End Using
         Catch ex As Exception
@@ -55,59 +66,26 @@ Public Class Form2
         End Try
     End Sub
 
-    Private Sub FormatDataGridAsBox(dgv As DataGridView)
-        dgv.BorderStyle = BorderStyle.FixedSingle
-        dgv.GridColor = Color.LightGray
-        dgv.CellBorderStyle = DataGridViewCellBorderStyle.Single
-        dgv.EnableHeadersVisualStyles = False
-        dgv.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(240, 240, 240)
-        dgv.ColumnHeadersDefaultCellStyle.WrapMode = DataGridViewTriState.True
-        dgv.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        dgv.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
-        For Each col As DataGridViewColumn In dgv.Columns
-            col.DefaultCellStyle.WrapMode = DataGridViewTriState.True
-            col.DefaultCellStyle.Alignment = DataGridViewContentAlignment.TopLeft
-            col.DefaultCellStyle.Padding = New Padding(6)
-        Next
-        dgv.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells
-        dgv.RowTemplate.Height = 40
-        dgv.RowTemplate.DefaultCellStyle.WrapMode = DataGridViewTriState.True
-        dgv.SelectionMode = DataGridViewSelectionMode.FullRowSelect
-        dgv.MultiSelect = False
-        dgv.ReadOnly = True
-
-        dgv.Refresh()
-    End Sub
-    Private Sub MakeCellsSquare(dgv As DataGridView)
-        If dgv.Columns.Count = 0 Then Return
-
-        Dim availableWidth As Integer = dgv.ClientSize.Width - dgv.RowHeadersWidth
-        Dim vsb As ScrollBar = Nothing
-        For Each ctl As Control In dgv.Controls
-            If TypeOf ctl Is VScrollBar Then
-                vsb = DirectCast(ctl, VScrollBar)
-                Exit For
-            End If
-        Next
-        If vsb IsNot Nothing AndAlso vsb.Visible Then
-            availableWidth -= SystemInformation.VerticalScrollBarWidth
+    Private Sub OnTypeButtonClick(sender As Object, e As EventArgs)
+        If sender Is btn_fruit Then
+            CurrentType = "fruit"
+        ElseIf sender Is btn_vegetable Then
+            CurrentType = "vegetable"
+        ElseIf sender Is btn_meat Then
+            CurrentType = "meat"
+        ElseIf sender Is btn_dairy Then
+            CurrentType = "dairy"
+        ElseIf sender Is btn_bread Then
+            CurrentType = "bread"
+        ElseIf sender Is btn_beverage Then
+            CurrentType = "beverage"
         End If
 
-        Dim colCount As Integer = dgv.Columns.Count
-        Dim widthPerCol As Integer = Math.Max(60, Math.Floor(availableWidth / colCount))
+        LoadDataIntoGrid()
+    End Sub
 
-        Dim maxCellSize As Integer = 300
-        If widthPerCol > maxCellSize Then widthPerCol = maxCellSize
-
-        For Each col As DataGridViewColumn In dgv.Columns
-            col.AutoSizeMode = DataGridViewAutoSizeColumnMode.None
-            col.Width = widthPerCol
-        Next
-
-        For Each row As DataGridViewRow In dgv.Rows
-            row.Height = widthPerCol
-        Next
-
-        dgv.Refresh()
+    Private Sub btn_back_form1_Click(sender As Object, e As EventArgs) Handles btn_back_form1.Click
+        Form2.ActiveForm.Close()
+        Form1.Show()
     End Sub
 End Class
