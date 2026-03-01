@@ -3,6 +3,7 @@ Imports System.Data
 Imports System.Windows.Forms
 
 Public Class Form2
+
     Private ReadOnly connString As String =
                             "Server=mysql-2bcvngvt87654-developer242005-158b.j.aivencloud.com;" &
                             "Port=12587;" &
@@ -10,9 +11,11 @@ Public Class Form2
                             "Uid=avnadmin;" &
                             "Pwd=AVNS_zqTo32pnIgcTnqiHRHQ;" &
                             "SslMode=Required;"
+
     <System.ComponentModel.Browsable(False)>
     <System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)>
     Public Property AccountId As Integer = -1
+
     Private Property CurrentType As String = "fruit"
 
     Private Async Sub Form2_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -23,17 +26,15 @@ Public Class Form2
         AddHandler btn_dairy.Click, AddressOf OnTypeButtonClick
         AddHandler btn_bread.Click, AddressOf OnTypeButtonClick
         AddHandler btn_beverage.Click, AddressOf OnTypeButtonClick
-
         Await LoadDataIntoGrid()
     End Sub
 
-    Private Async Function LoadDataIntoGrid(Optional customQuery As String = Nothing) As System.Threading.Tasks.Task
+    Private Async Function LoadDataIntoGrid(Optional customQuery As String = Nothing) As Threading.Tasks.Task
         Dim baseQuery As String = "SELECT `name`, `amount` FROM Items WHERE `type` = @type"
         If AccountId >= 0 Then
             baseQuery &= " AND account_id = @accountId"
         End If
         baseQuery &= " ORDER BY `name`"
-
         Dim query As String = If(String.IsNullOrWhiteSpace(customQuery), baseQuery, customQuery)
 
         Try
@@ -47,12 +48,10 @@ Public Class Form2
                     If AccountId >= 0 AndAlso query.Contains("@accountId") Then
                         cmd.Parameters.Add("@accountId", MySqlDbType.Int32).Value = AccountId
                     End If
-
                     Dim dt As New DataTable()
                     Using reader = Await cmd.ExecuteReaderAsync()
                         dt.Load(reader)
                     End Using
-
                     dgv_inventory.DataSource = dt
                     If dgv_inventory.Columns.Contains("name") Then
                         dgv_inventory.Columns("name").HeaderText = "Name"
@@ -83,7 +82,6 @@ Public Class Form2
         ElseIf sender Is btn_beverage Then
             CurrentType = "beverage"
         End If
-
         Await LoadDataIntoGrid()
     End Sub
 
@@ -91,4 +89,76 @@ Public Class Form2
         Me.Close()
         Form1.Show()
     End Sub
+
+    Private Async Sub btn_add_Click(sender As Object, e As EventArgs) Handles btn_add.Click
+        If String.IsNullOrWhiteSpace(CurrentType) Then
+            MsgBox("Please select a category first.")
+            Exit Sub
+        End If
+
+        Dim itemName As String = InputBox("Enter item name:")
+        If String.IsNullOrWhiteSpace(itemName) Then Exit Sub
+
+        Dim amountInput As String = InputBox("Enter amount:")
+        Dim amount As Integer
+        If Not Integer.TryParse(amountInput, amount) Then
+            MsgBox("Invalid amount.")
+            Exit Sub
+        End If
+
+        Try
+            Using cn As New MySqlConnection(connString)
+                Await cn.OpenAsync()
+                Dim query As String = "INSERT INTO Items (`name`, `type`, `amount`, `account_id`) 
+                                       VALUES (@name, @type, @amount, @accountId)"
+                Using cmd As New MySqlCommand(query, cn)
+                    cmd.Parameters.Add("@name", MySqlDbType.VarChar).Value = itemName
+                    cmd.Parameters.Add("@type", MySqlDbType.VarChar).Value = CurrentType
+                    cmd.Parameters.Add("@amount", MySqlDbType.Int32).Value = amount
+                    cmd.Parameters.Add("@accountId", MySqlDbType.Int32).Value = AccountId
+                    Await cmd.ExecuteNonQueryAsync()
+                End Using
+            End Using
+            MsgBox("Item added successfully!")
+            Await LoadDataIntoGrid()
+        Catch ex As Exception
+            MsgBox("Error adding item: " & ex.Message)
+        End Try
+    End Sub
+
+    Private Async Sub btn_delete_Click(sender As Object, e As EventArgs) Handles btn_delete.Click
+        If dgv_inventory.CurrentRow Is Nothing Then
+            MsgBox("Please select an item to delete.")
+            Exit Sub
+        End If
+
+        Dim itemName As String = dgv_inventory.CurrentRow.Cells("name").Value.ToString()
+        Dim confirm = MessageBox.Show("Delete " & itemName & " ?", "Confirm Delete", MessageBoxButtons.YesNo)
+        If confirm <> DialogResult.Yes Then Exit Sub
+
+        Try
+            Using cn As New MySqlConnection(connString)
+                Await cn.OpenAsync()
+                Dim query As String = "DELETE FROM Items 
+                                       WHERE `name` = @name 
+                                       AND `type` = @type"
+                If AccountId >= 0 Then
+                    query &= " AND account_id = @accountId"
+                End If
+                Using cmd As New MySqlCommand(query, cn)
+                    cmd.Parameters.Add("@name", MySqlDbType.VarChar).Value = itemName
+                    cmd.Parameters.Add("@type", MySqlDbType.VarChar).Value = CurrentType
+                    If AccountId >= 0 Then
+                        cmd.Parameters.Add("@accountId", MySqlDbType.Int32).Value = AccountId
+                    End If
+                    Await cmd.ExecuteNonQueryAsync()
+                End Using
+            End Using
+            MsgBox("Item deleted successfully!")
+            Await LoadDataIntoGrid()
+        Catch ex As Exception
+            MsgBox("Error deleting item: " & ex.Message)
+        End Try
+    End Sub
+
 End Class

@@ -30,6 +30,8 @@ Partial Class Form2
         btn_bread = New Button()
         btn_beverage = New Button()
         btn_back_form1 = New Button()
+        btn_add = New Button()
+        btn_delete = New Button()
         CType(dgv_inventory, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
@@ -38,7 +40,7 @@ Partial Class Form2
         dgv_inventory.BackgroundColor = SystemColors.Control
         dgv_inventory.BorderStyle = BorderStyle.None
         dgv_inventory.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        dgv_inventory.Location = New Point(343, 132)
+        dgv_inventory.Location = New Point(337, 41)
         dgv_inventory.Name = "dgv_inventory"
         dgv_inventory.RowHeadersWidth = 51
         dgv_inventory.Size = New Size(978, 534)
@@ -122,11 +124,37 @@ Partial Class Form2
         btn_back_form1.Text = "Back"
         btn_back_form1.UseVisualStyleBackColor = False
         ' 
+        ' btn_add
+        ' 
+        btn_add.BackColor = Color.Transparent
+        btn_add.FlatStyle = FlatStyle.Flat
+        btn_add.Font = New Font("Segoe UI", 10.8F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        btn_add.Location = New Point(555, 632)
+        btn_add.Name = "btn_add"
+        btn_add.Size = New Size(207, 55)
+        btn_add.TabIndex = 15
+        btn_add.Text = "Add Item"
+        btn_add.UseVisualStyleBackColor = False
+        ' 
+        ' btn_delete
+        ' 
+        btn_delete.BackColor = Color.Transparent
+        btn_delete.FlatStyle = FlatStyle.Flat
+        btn_delete.Font = New Font("Segoe UI", 10.8F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        btn_delete.Location = New Point(821, 632)
+        btn_delete.Name = "btn_delete"
+        btn_delete.Size = New Size(207, 55)
+        btn_delete.TabIndex = 16
+        btn_delete.Text = "Delete Item"
+        btn_delete.UseVisualStyleBackColor = False
+        ' 
         ' Form2
         ' 
         AutoScaleDimensions = New SizeF(8F, 20F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1393, 738)
+        Controls.Add(btn_delete)
+        Controls.Add(btn_add)
         Controls.Add(btn_back_form1)
         Controls.Add(btn_beverage)
         Controls.Add(btn_bread)
@@ -149,4 +177,6 @@ Partial Class Form2
     Friend WithEvents btn_bread As Button
     Friend WithEvents btn_beverage As Button
     Friend WithEvents btn_back_form1 As Button
+    Friend WithEvents btn_add As Button
+    Friend WithEvents btn_delete As Button
 End Class
