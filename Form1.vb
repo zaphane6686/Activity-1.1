@@ -12,10 +12,10 @@ Public Class Form1
                             "Uid=avnadmin;" &
                             "Pwd=AVNS_zqTo32pnIgcTnqiHRHQ;" &
                             "SslMode=Required;"
-    Dim mode As String
-    Dim userName As String
-    Dim firstName As String
-    Dim lastName As String
+    Private Property mode As String
+    Private Property userName As String
+    Private Property firstName As String
+    Private Property lastName As String
 
     Private Sub User_Login_Design_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         chk_show_pass.Visible = False
