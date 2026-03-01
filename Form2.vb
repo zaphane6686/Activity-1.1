@@ -154,7 +154,6 @@ Public Class Form2
                     Await cmd.ExecuteNonQueryAsync()
                 End Using
             End Using
-            MsgBox("Item deleted successfully!")
             Await LoadDataIntoGrid()
         Catch ex As Exception
             MsgBox("Error deleting item: " & ex.Message)
