@@ -40,10 +40,10 @@ Partial Class Form2
         dgv_inventory.BackgroundColor = SystemColors.Control
         dgv_inventory.BorderStyle = BorderStyle.None
         dgv_inventory.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        dgv_inventory.Location = New Point(337, 41)
+        dgv_inventory.Location = New Point(337, 132)
         dgv_inventory.Name = "dgv_inventory"
         dgv_inventory.RowHeadersWidth = 51
-        dgv_inventory.Size = New Size(978, 534)
+        dgv_inventory.Size = New Size(978, 443)
         dgv_inventory.TabIndex = 0
         ' 
         ' btn_fruit
