@@ -1,7 +1,5 @@
 ﻿Imports MySql.Data.MySqlClient
-Imports Mysqlx.Cursor
 Imports System.Data
-Imports System.Diagnostics.Eventing.Reader
 Imports System.Diagnostics
 
 Public Class Form1
@@ -188,7 +186,6 @@ Public Class Form1
                                             AddHandler Form2.FormClosed, AddressOf Form2_FormClosed
                                             Me.Hide()
                                             Form2.Show()
-                                            MsgBox("Login successful! Welcome, " & userName & ".")
                                             txtbx_input.Text = "Enter Username"
                                             chk_show_pass.Visible = False
                                             mode = "readerUserName"

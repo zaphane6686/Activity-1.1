@@ -1,7 +1,5 @@
 ﻿Imports MySql.Data.MySqlClient
-Imports Mysqlx.Cursor
 Imports System.Data
-Imports System.Diagnostics.Eventing.Reader
 Imports System.Windows.Forms
 
 Public Class Form2
@@ -17,7 +15,7 @@ Public Class Form2
     Public Property AccountId As Integer = -1
     Private Property CurrentType As String = "fruit"
 
-    Private Sub Form2_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Async Sub Form2_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CurrentType = "fruit"
         AddHandler btn_fruit.Click, AddressOf OnTypeButtonClick
         AddHandler btn_vegetable.Click, AddressOf OnTypeButtonClick
@@ -26,11 +24,11 @@ Public Class Form2
         AddHandler btn_bread.Click, AddressOf OnTypeButtonClick
         AddHandler btn_beverage.Click, AddressOf OnTypeButtonClick
 
-        LoadDataIntoGrid()
+        Await LoadDataIntoGrid()
     End Sub
 
-    Private Sub LoadDataIntoGrid(Optional customQuery As String = Nothing)
-        Dim baseQuery As String = "SELECT `name`, `ammount` FROM Items WHERE `type` = @type"
+    Private Async Function LoadDataIntoGrid(Optional customQuery As String = Nothing) As System.Threading.Tasks.Task
+        Dim baseQuery As String = "SELECT `name`, `amount` FROM Items WHERE `type` = @type"
         If AccountId >= 0 Then
             baseQuery &= " AND account_id = @accountId"
         End If
@@ -40,33 +38,38 @@ Public Class Form2
 
         Try
             Using cn As New MySqlConnection(connString)
-                cn.Open()
-                Using da As New MySqlDataAdapter(query, cn)
-                    da.SelectCommand.Parameters.Clear()
-                    da.SelectCommand.Parameters.AddWithValue("@type", CurrentType)
-                    If AccountId >= 0 Then
-                        da.SelectCommand.Parameters.AddWithValue("@accountId", AccountId)
+                Await cn.OpenAsync()
+                Using cmd As New MySqlCommand(query, cn)
+                    cmd.Parameters.Clear()
+                    If query.Contains("@type") Then
+                        cmd.Parameters.Add("@type", MySqlDbType.VarChar).Value = CurrentType
+                    End If
+                    If AccountId >= 0 AndAlso query.Contains("@accountId") Then
+                        cmd.Parameters.Add("@accountId", MySqlDbType.Int32).Value = AccountId
                     End If
 
                     Dim dt As New DataTable()
-                    da.Fill(dt)
+                    Using reader = Await cmd.ExecuteReaderAsync()
+                        dt.Load(reader)
+                    End Using
+
                     dgv_inventory.DataSource = dt
                     If dgv_inventory.Columns.Contains("name") Then
                         dgv_inventory.Columns("name").HeaderText = "Name"
                         dgv_inventory.Columns("name").DisplayIndex = 0
                     End If
-                    If dgv_inventory.Columns.Contains("ammount") Then
-                        dgv_inventory.Columns("ammount").HeaderText = "Amount"
-                        dgv_inventory.Columns("ammount").DisplayIndex = 1
+                    If dgv_inventory.Columns.Contains("amount") Then
+                        dgv_inventory.Columns("amount").HeaderText = "Amount"
+                        dgv_inventory.Columns("amount").DisplayIndex = 1
                     End If
                 End Using
             End Using
         Catch ex As Exception
             MsgBox("Error loading data: " & ex.Message)
         End Try
-    End Sub
+    End Function
 
-    Private Sub OnTypeButtonClick(sender As Object, e As EventArgs)
+    Private Async Sub OnTypeButtonClick(sender As Object, e As EventArgs)
         If sender Is btn_fruit Then
             CurrentType = "fruit"
         ElseIf sender Is btn_vegetable Then
@@ -81,11 +84,11 @@ Public Class Form2
             CurrentType = "beverage"
         End If
 
-        LoadDataIntoGrid()
+        Await LoadDataIntoGrid()
     End Sub
 
     Private Sub btn_back_form1_Click(sender As Object, e As EventArgs) Handles btn_back_form1.Click
-        Form2.ActiveForm.Close()
+        Me.Close()
         Form1.Show()
     End Sub
 End Class
