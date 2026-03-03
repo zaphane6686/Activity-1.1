@@ -138,7 +138,7 @@ Public Class Form1
                         End Using
                     End Using
                 Catch ex As Exception
-                    MsgBox("Read error: " & ex.Message)
+                    MsgBox("Server down, please try again later while we fix the issue.")
                 End Try
 
             Case "readerPassword"
