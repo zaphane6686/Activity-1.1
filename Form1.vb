@@ -29,7 +29,12 @@ Public Class Form1
             Case "sqlFirstName"
                 Try
                     txtbx_input.PasswordChar = ControlChars.NullChar
-                    firstName = txtbx_input.Text
+                    firstName = txtbx_input.Text.Trim()
+                    If firstName.Length = 0 Then
+                        MsgBox("Please enter a first name.")
+                        txtbx_input.Focus()
+                        Return
+                    End If
                     txtbx_input.Text = "Enter Last Name"
                     mode = "sqlLastName"
                 Catch ex As Exception
@@ -38,7 +43,12 @@ Public Class Form1
 
             Case "sqlLastName"
                 Try
-                    lastName = txtbx_input.Text
+                    lastName = txtbx_input.Text.Trim()
+                    If lastName.Length = 0 Then
+                        MsgBox("Please enter a last name.")
+                        txtbx_input.Focus()
+                        Return
+                    End If
                     txtbx_input.Text = "Enter Your Username"
                     mode = "sqlUserName"
                 Catch ex As Exception
@@ -46,13 +56,36 @@ Public Class Form1
                 End Try
 
             Case "sqlUserName"
+                Dim qry As String = "SELECT userName FROM Accounts WHERE userName = @username LIMIT 1;"
                 Try
-                    userName = txtbx_input.Text.Trim()
-                    txtbx_input.Text = "Enter Your Password"
-                    chk_show_pass.Visible = True
-                    mode = "sqlPassWord"
+                    Dim tempUser = txtbx_input.Text.Trim()
+                    If tempUser.Length = 0 Then
+                        MsgBox("Please enter a username.")
+                        txtbx_input.Focus()
+                        Return
+                    End If
+
+                    Using cn As New MySqlConnection(connString)
+                        cn.Open()
+                        Using cmd As New MySqlCommand(qry, cn)
+                            cmd.Parameters.AddWithValue("@username", tempUser)
+                            Using reader As MySqlDataReader = cmd.ExecuteReader()
+                                If reader.Read() Then
+                                    MsgBox("Username is already taken. Try another.")
+                                    txtbx_input.Text = ""
+                                    txtbx_input.Focus()
+                                    Return
+                                Else
+                                    userName = tempUser
+                                    txtbx_input.Text = "Enter Your Password"
+                                    chk_show_pass.Visible = True
+                                    mode = "sqlPassWord"
+                                End If
+                            End Using
+                        End Using
+                    End Using
                 Catch ex As Exception
-                    MsgBox(ex.Message)
+                    MsgBox("Read error: " & ex.Message)
                 End Try
 
             Case "sqlPassWord"
@@ -63,56 +96,36 @@ Public Class Form1
                         mode = "sqlFirstName"
                         txtbx_input.PasswordChar = ControlChars.NullChar
                     Else
-
-                        Dim qry As String = "SELECT userName FROM Accounts WHERE userName = @username LIMIT 1;"
-                        Try
-                            Using cn As New MySqlConnection(connString)
-                                cn.Open()
-                                Using cmd As New MySqlCommand(qry, cn)
-                                    cmd.Parameters.AddWithValue("@username", userName)
-                                    Using reader As MySqlDataReader = cmd.ExecuteReader()
-                                        If reader.Read() Then
-                                            MsgBox("Username is already taken")
-                                        Else
-                                            Dim password As String = txtbx_input.Text
-                                            Dim query As String = "INSERT INTO Accounts (firstName, lastName, userName, password) VALUES (@firstname, @lastname, @username, @password);"
-                                            Using con As New MySqlConnection(connString)
-                                                con.Open()
-                                                Using comd As New MySqlCommand(query, con)
-                                                    comd.Parameters.AddWithValue("@username", userName)
-                                                    comd.Parameters.AddWithValue("@password", password)
-                                                    comd.Parameters.AddWithValue("@firstname", firstName)
-                                                    comd.Parameters.AddWithValue("@lastname", lastName)
-                                                    Try
-                                                        Dim affected As Integer = comd.ExecuteNonQuery()
-                                                        If affected > 0 Then
-                                                            MsgBox("Record saved.")
-                                                        Else
-                                                            MsgBox("No rows were inserted.")
-                                                        End If
-                                                    Catch mex As MySqlException
-                                                        If mex.Number = 1062 Then
-                                                            MsgBox("Username already exists. Please choose a different username.")
-                                                        Else
-                                                            MsgBox("Database error while inserting record: " & mex.Message)
-                                                        End If
-                                                    End Try
-                                                End Using
-                                            End Using
-
-                                            txtbx_input.Text = "Enter Username"
-                                            chk_show_pass.Visible = False
-                                            mode = "readerUserName"
-                                            btn_create_acc.Text = "Create Account"
-                                            txtbx_input.PasswordChar = ControlChars.NullChar
-                                        End If
-                                    End Using
-                                End Using
+                        Dim password As String = txtbx_input.Text
+                        Dim query As String = "INSERT INTO Accounts (firstName, lastName, userName, password) VALUES (@firstname, @lastname, @username, @password);"
+                        Using con As New MySqlConnection(connString)
+                            con.Open()
+                            Using comd As New MySqlCommand(query, con)
+                                comd.Parameters.AddWithValue("@username", userName)
+                                comd.Parameters.AddWithValue("@password", password)
+                                comd.Parameters.AddWithValue("@firstname", firstName)
+                                comd.Parameters.AddWithValue("@lastname", lastName)
+                                Try
+                                    Dim affected As Integer = comd.ExecuteNonQuery()
+                                    If affected > 0 Then
+                                        MsgBox("Record saved.")
+                                    Else
+                                        MsgBox("No rows were inserted.")
+                                    End If
+                                Catch mex As MySqlException
+                                    If mex.Number = 1062 Then
+                                        MsgBox("Username already exists. Please choose a different username.")
+                                    Else
+                                        MsgBox("Database error while inserting record: " & mex.Message)
+                                    End If
+                                End Try
                             End Using
-                        Catch ex As Exception
-                            MsgBox("Read error: " & ex.Message)
-                        End Try
-
+                        End Using
+                        txtbx_input.Text = "Enter Username"
+                        chk_show_pass.Visible = False
+                        mode = "readerUserName"
+                        btn_create_acc.Text = "Create Account"
+                        txtbx_input.PasswordChar = ControlChars.NullChar
                     End If
                 Catch ex As Exception
                     MsgBox(ex.Message)
@@ -127,11 +140,6 @@ Public Class Form1
                             cmd.Parameters.AddWithValue("@username", txtbx_input.Text.Trim())
                             Using reader As MySqlDataReader = cmd.ExecuteReader()
                                 If reader.Read() Then
-                                    If reader.Read() Then
-                                        firstName = reader("firstname").ToString()
-                                        lastName = reader("lastname").ToString()
-                                        MsgBox("Welcome back, " & firstName & " " & lastName & "!")
-                                    End If
                                     userName = reader("userName").ToString()
                                     txtbx_input.Text = "Enter Password"
                                     chk_show_pass.Visible = True
