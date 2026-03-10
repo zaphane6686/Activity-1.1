@@ -1,6 +1,7 @@
 ﻿Imports MySql.Data.MySqlClient
 Imports System.Data
 Imports System.Diagnostics
+Imports System.Drawing.Text
 
 Public Class Form1
     Private ReadOnly connString As String =
@@ -56,7 +57,6 @@ Public Class Form1
 
             Case "sqlPassWord"
                 Try
-                    Dim password As String = txtbx_input.Text
                     If String.IsNullOrWhiteSpace(firstName) OrElse String.IsNullOrWhiteSpace(lastName) OrElse String.IsNullOrWhiteSpace(userName) Then
                         MsgBox("Missing data: ensure First Name, Last Name and Username are provided.")
                         txtbx_input.Text = "Enter First Name"
@@ -74,6 +74,7 @@ Public Class Form1
                                         If reader.Read() Then
                                             MsgBox("Username is already taken")
                                         Else
+                                            Dim password As String = txtbx_input.Text
                                             Dim query As String = "INSERT INTO Accounts (firstName, lastName, userName, password) VALUES (@firstname, @lastname, @username, @password);"
                                             Using con As New MySqlConnection(connString)
                                                 con.Open()
@@ -118,7 +119,7 @@ Public Class Form1
                 End Try
 
             Case "readerUserName"
-                Dim query As String = "SELECT userName FROM Accounts WHERE userName = @username LIMIT 1;"
+                Dim query As String = "SELECT firstname,lastname,userName FROM Accounts WHERE userName = @username LIMIT 1;"
                 Try
                     Using cn As New MySqlConnection(connString)
                         cn.Open()
@@ -126,6 +127,11 @@ Public Class Form1
                             cmd.Parameters.AddWithValue("@username", txtbx_input.Text.Trim())
                             Using reader As MySqlDataReader = cmd.ExecuteReader()
                                 If reader.Read() Then
+                                    If reader.Read() Then
+                                        firstName = reader("firstname").ToString()
+                                        lastName = reader("lastname").ToString()
+                                        MsgBox("Welcome back, " & firstName & " " & lastName & "!")
+                                    End If
                                     userName = reader("userName").ToString()
                                     txtbx_input.Text = "Enter Password"
                                     chk_show_pass.Visible = True
