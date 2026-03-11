@@ -15,7 +15,6 @@ Public Class Form2
     <System.ComponentModel.Browsable(False)>
     <System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)>
     Public Property AccountId As Integer = -1
-
     Private Property CurrentType As String = "fruit"
 
     Private Async Sub Form2_Load(sender As Object, e As EventArgs) Handles MyBase.Load

@@ -32,6 +32,7 @@ Public Class Form1
                     firstName = txtbx_input.Text.Trim()
                     If firstName.Length = 0 Then
                         MsgBox("Please enter a first name.")
+                        txtbx_input.Text = "Enter First Name"
                         txtbx_input.Focus()
                         Return
                     End If
@@ -46,6 +47,7 @@ Public Class Form1
                     lastName = txtbx_input.Text.Trim()
                     If lastName.Length = 0 Then
                         MsgBox("Please enter a last name.")
+                        txtbx_input.Text = "Enter Last Name"
                         txtbx_input.Focus()
                         Return
                     End If
@@ -61,6 +63,7 @@ Public Class Form1
                     Dim tempUser = txtbx_input.Text.Trim()
                     If tempUser.Length = 0 Then
                         MsgBox("Please enter a username.")
+                        txtbx_input.Text = "Enter Your Username"
                         txtbx_input.Focus()
                         Return
                     End If
@@ -72,7 +75,7 @@ Public Class Form1
                             Using reader As MySqlDataReader = cmd.ExecuteReader()
                                 If reader.Read() Then
                                     MsgBox("Username is already taken. Try another.")
-                                    txtbx_input.Text = ""
+                                    txtbx_input.Text = "Enter Your Username"
                                     txtbx_input.Focus()
                                     Return
                                 Else
