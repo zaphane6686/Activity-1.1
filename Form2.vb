@@ -52,7 +52,6 @@ Public Class Form2
                         dt.Load(reader)
                     End Using
                     dgv_inventory.DataSource = dt
-                    ' Adjust column sizing and appearance so longer names/amounts are visible
                     dgv_inventory.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None
                     dgv_inventory.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells
 
