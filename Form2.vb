@@ -52,13 +52,32 @@ Public Class Form2
                         dt.Load(reader)
                     End Using
                     dgv_inventory.DataSource = dt
+                    ' Adjust column sizing and appearance so longer names/amounts are visible
+                    dgv_inventory.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None
+                    dgv_inventory.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells
+
                     If dgv_inventory.Columns.Contains("name") Then
-                        dgv_inventory.Columns("name").HeaderText = "Name"
-                        dgv_inventory.Columns("name").DisplayIndex = 0
+                        Dim colName = dgv_inventory.Columns("name")
+                        colName.HeaderText = "Name"
+                        colName.DisplayIndex = 0
+                        colName.Width = 450
+                        colName.DefaultCellStyle.WrapMode = DataGridViewTriState.True
+                        Dim tbName = TryCast(colName, DataGridViewTextBoxColumn)
+                        If tbName IsNot Nothing Then
+                            tbName.MaxInputLength = 200
+                        End If
                     End If
+
                     If dgv_inventory.Columns.Contains("amount") Then
-                        dgv_inventory.Columns("amount").HeaderText = "Amount"
-                        dgv_inventory.Columns("amount").DisplayIndex = 1
+                        Dim colAmount = dgv_inventory.Columns("amount")
+                        colAmount.HeaderText = "Amount"
+                        colAmount.DisplayIndex = 1
+                        colAmount.Width = 450
+                        colAmount.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
+                        Dim tbAmt = TryCast(colAmount, DataGridViewTextBoxColumn)
+                        If tbAmt IsNot Nothing Then
+                            tbAmt.MaxInputLength = 200
+                        End If
                     End If
                 End Using
             End Using
