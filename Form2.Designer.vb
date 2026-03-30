@@ -32,6 +32,7 @@ Partial Class Form2
         btn_back_form1 = New Button()
         btn_add = New Button()
         btn_delete = New Button()
+        btn_update = New Button()
         CType(dgv_inventory, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
@@ -129,7 +130,7 @@ Partial Class Form2
         btn_add.BackColor = Color.Transparent
         btn_add.FlatStyle = FlatStyle.Flat
         btn_add.Font = New Font("Segoe UI", 10.8F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        btn_add.Location = New Point(555, 632)
+        btn_add.Location = New Point(445, 632)
         btn_add.Name = "btn_add"
         btn_add.Size = New Size(207, 55)
         btn_add.TabIndex = 15
@@ -141,18 +142,31 @@ Partial Class Form2
         btn_delete.BackColor = Color.Transparent
         btn_delete.FlatStyle = FlatStyle.Flat
         btn_delete.Font = New Font("Segoe UI", 10.8F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        btn_delete.Location = New Point(821, 632)
+        btn_delete.Location = New Point(962, 632)
         btn_delete.Name = "btn_delete"
         btn_delete.Size = New Size(207, 55)
         btn_delete.TabIndex = 16
         btn_delete.Text = "Delete Item"
         btn_delete.UseVisualStyleBackColor = False
         ' 
+        ' btn_update
+        ' 
+        btn_update.BackColor = Color.Transparent
+        btn_update.FlatStyle = FlatStyle.Flat
+        btn_update.Font = New Font("Segoe UI", 10.8F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        btn_update.Location = New Point(707, 632)
+        btn_update.Name = "btn_update"
+        btn_update.Size = New Size(207, 55)
+        btn_update.TabIndex = 17
+        btn_update.Text = "Update Item"
+        btn_update.UseVisualStyleBackColor = False
+        ' 
         ' Form2
         ' 
         AutoScaleDimensions = New SizeF(8F, 20F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1393, 738)
+        Controls.Add(btn_update)
         Controls.Add(btn_delete)
         Controls.Add(btn_add)
         Controls.Add(btn_back_form1)
@@ -179,4 +193,5 @@ Partial Class Form2
     Friend WithEvents btn_back_form1 As Button
     Friend WithEvents btn_add As Button
     Friend WithEvents btn_delete As Button
+    Friend WithEvents btn_update As Button
 End Class
