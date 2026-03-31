@@ -12,6 +12,8 @@ Public Class Form2
         "Pwd=AVNS_zqTo32pnIgcTnqiHRHQ;" &
         "SslMode=Required;"
 
+    <System.ComponentModel.Browsable(False)>
+    <System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)>
     Public Property AccountId As Integer = -1
     Private Property CurrentType As String = "fruit"
 
@@ -22,10 +24,12 @@ Public Class Form2
         AddHandler btn_dairy.Click, AddressOf OnTypeButtonClick
         AddHandler btn_bread.Click, AddressOf OnTypeButtonClick
         AddHandler btn_beverage.Click, AddressOf OnTypeButtonClick
+        OnTypeButtonClick(btn_fruit, EventArgs.Empty)
         Await LoadDataIntoGrid()
     End Sub
 
     Private Async Function LoadDataIntoGrid(Optional customQuery As String = Nothing) As Threading.Tasks.Task
+
 
         Dim baseQuery As String = "SELECT `name`, `amount` FROM Items WHERE `type` = @type"
 
@@ -137,7 +141,7 @@ Public Class Form2
             Exit Sub
         End If
 
-        Dim itemName As String = InputBox("Enter item name:")
+        Dim itemName As String = InputBox("Enter " & CurrentType & " name:")
         If String.IsNullOrWhiteSpace(itemName) Then Exit Sub
 
         Dim amountInput As String = InputBox("Enter amount:")
@@ -230,7 +234,7 @@ Public Class Form2
     Private Async Sub btn_delete_Click(sender As Object, e As EventArgs) Handles btn_delete.Click
 
         If dgv_inventory.CurrentRow Is Nothing Then
-            MsgBox("Please select an item to delete.")
+            MsgBox("Please select an row to delete.")
             Exit Sub
         End If
 
