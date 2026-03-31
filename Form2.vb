@@ -106,15 +106,15 @@ Public Class Form2
 
         ElseIf sender Is btn_meat Then
             CurrentType = "meat"
-            btn_meat.BackColor = Color.Beige
+            btn_meat.BackColor = Color.LightPink
 
         ElseIf sender Is btn_dairy Then
             CurrentType = "dairy"
-            btn_dairy.BackColor = Color.LightYellow
+            btn_dairy.BackColor = Color.Beige
 
         ElseIf sender Is btn_bread Then
             CurrentType = "bread"
-            btn_bread.BackColor = Color.LightGoldenrodYellow
+            btn_bread.BackColor = Color.LightBlue
 
         ElseIf sender Is btn_beverage Then
             CurrentType = "beverage"
