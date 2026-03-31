@@ -88,10 +88,42 @@ Public Class Form2
     End Function
 
     Private Async Sub OnTypeButtonClick(sender As Object, e As EventArgs)
-        Dim btn As Button = CType(sender, Button)
-        CurrentType = btn.Text.ToLower()
+
+        btn_fruit.BackColor = SystemColors.Control
+        btn_vegetable.BackColor = SystemColors.Control
+        btn_meat.BackColor = SystemColors.Control
+        btn_dairy.BackColor = SystemColors.Control
+        btn_bread.BackColor = SystemColors.Control
+        btn_beverage.BackColor = SystemColors.Control
+
+        If sender Is btn_fruit Then
+            CurrentType = "fruit"
+            btn_fruit.BackColor = Color.LightSalmon
+
+        ElseIf sender Is btn_vegetable Then
+            CurrentType = "vegetable"
+            btn_vegetable.BackColor = Color.LightGreen
+
+        ElseIf sender Is btn_meat Then
+            CurrentType = "meat"
+            btn_meat.BackColor = Color.Beige
+
+        ElseIf sender Is btn_dairy Then
+            CurrentType = "dairy"
+            btn_dairy.BackColor = Color.LightYellow
+
+        ElseIf sender Is btn_bread Then
+            CurrentType = "bread"
+            btn_bread.BackColor = Color.LightGoldenrodYellow
+
+        ElseIf sender Is btn_beverage Then
+            CurrentType = "beverage"
+            btn_beverage.BackColor = Color.LightGray
+        End If
+
         Await LoadDataIntoGrid()
     End Sub
+
 
     Private Sub btn_back_form1_Click(sender As Object, e As EventArgs) Handles btn_back_form1.Click
         Me.Close()
