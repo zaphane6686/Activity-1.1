@@ -11,7 +11,8 @@ Public Class Form2
         "Uid=avnadmin;" &
         "Pwd=AVNS_zqTo32pnIgcTnqiHRHQ;" &
         "SslMode=Required;"
-
+    <System.ComponentModel.Browsable(False)>
+    <System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)>
     Public Property AccountId As Integer = -1
     Private Property CurrentType As String = "fruit"
 
@@ -22,6 +23,7 @@ Public Class Form2
         AddHandler btn_dairy.Click, AddressOf OnTypeButtonClick
         AddHandler btn_bread.Click, AddressOf OnTypeButtonClick
         AddHandler btn_beverage.Click, AddressOf OnTypeButtonClick
+        OnTypeButtonClick(btn_fruit, EventArgs.Empty)
         Await LoadDataIntoGrid()
     End Sub
 
@@ -137,7 +139,7 @@ Public Class Form2
             Exit Sub
         End If
 
-        Dim itemName As String = InputBox("Enter item name:")
+        Dim itemName As String = InputBox("Enter " & CurrentType & " name:")
         If String.IsNullOrWhiteSpace(itemName) Then Exit Sub
 
         Dim amountInput As String = InputBox("Enter amount:")
